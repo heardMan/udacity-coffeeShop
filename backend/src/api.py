@@ -9,14 +9,25 @@ from .auth.auth import AuthError, requires_auth
 
 app = Flask(__name__)
 setup_db(app)
-CORS(app)
+
+# set up cors for the application
+CORS(app, resources={r'/': {'origins': '*'}})
+
+# to set Access-Control-Allow Headers and Methods
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Headers',
+                         'Content-Type, Authorization, true')
+    response.headers.add('Access-Control-Allow-Methods',
+                         'GET, PATCH,PUT,POST, DELETE, OPTIONS')
+    return response
 
 '''
 @TODO uncomment the following line to initialize the datbase
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 '''
-# db_drop_and_create_all()
+db_drop_and_create_all()
 
 ## ROUTES
 '''
@@ -27,7 +38,9 @@ CORS(app)
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
-
+@app.route('/drinks', methods=['GET'])
+def get_drinks():
+    return jsonify({'success':True , 'drinks':[]})
 
 '''
 @TODO implement endpoint
@@ -37,6 +50,11 @@ CORS(app)
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks-detail', methods=['GET'])
+@requires_auth()
+def get_drinks_detail(payload):
+    return jsonify({'success':True})
+
 
 
 '''
@@ -48,7 +66,10 @@ CORS(app)
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
         or appropriate status code indicating reason for failure
 '''
-
+@app.route('/drinks', methods=['POST'])
+@requires_auth()
+def create_drink():
+    return jsonify({'success':True})
 
 '''
 @TODO implement endpoint
@@ -61,7 +82,10 @@ CORS(app)
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
         or appropriate status code indicating reason for failure
 '''
-
+@app.route('/drinks/<int:drink_id>', methods=['PATCH'])
+@requires_auth()
+def edit_drink():
+    return jsonify({'success':True})
 
 '''
 @TODO implement endpoint
@@ -73,7 +97,10 @@ CORS(app)
     returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
         or appropriate status code indicating reason for failure
 '''
-
+@app.route('/drinks/<int:drink_id>', methods=['DELETE'])
+@requires_auth()
+def delete_drink(drink_id):
+    return jsonify({'success':True})
 
 ## Error Handling
 '''
@@ -108,3 +135,16 @@ def unprocessable(error):
 @TODO implement error handler for AuthError
     error handler should conform to general task above 
 '''
+
+@app.errorhandler(401)
+def unathorized(error):
+    return jsonify({
+                    "success": False, 
+                    "error": 401,
+                    "code": error.description['code'],
+                    "description": error.description['description'],
+                    }), 401
+
+# Default port:
+if __name__ == '__main__':
+    app.run()
