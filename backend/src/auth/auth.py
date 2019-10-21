@@ -74,30 +74,33 @@ def get_token_auth_header():
     return true otherwise
 '''
 def check_permissions(permission, payrload):
-    payload = {'iss': 'https://dev-y5wb70ja.auth0.com/', 'sub': 'auth0|5dacac0df0c1a50e0de64ee5', 'aud': 'drinks', 'iat': 1571617080, 'exp': 1571624280, 'azp': '4KLyPcC6GX5yKHM7fPByy6uOAej4mnsW', 'scope': ''}
+    '''this is a test payload with no permissions property'''
+    # payload = {
+    #     'iss': 'https://dev-y5wb70ja.auth0.com/',
+    #     'sub': 'auth0|5dacac0df0c1a50e0de64ee5',
+    #     'aud': 'drinks',
+    #     'iat': 1571617080,
+    #     'exp': 1571624280,
+    #     'azp': '4KLyPcC6GX5yKHM7fPByy6uOAej4mnsW',
+    #     'scope': ''}
     permissions = []
     if permission is not '':
         _permissions_ = permission.split(',')
         for _permission_ in _permissions_:
             permissions.append(_permission_)
-    print(payload)
     if payload.get('permissions') is None:
         raise AuthError({
             'code': 'no_permissions_found_on_jwt_payload',
             'description': 'Expected a permissions property on the payload but one was not found'
         }, 401)
-
     user_permissions = payload['permissions']
     for user_permission in user_permissions:
         permissions.append(user_permission)
-    
-    print(permissions)
-
-    # if len(permissions) <= 0:
-    #     raise AuthError({
-    #         'code': 'no_permissions_found',
-    #         'description': 'Expected to find some user permission but found none'
-    #     }, 401)
+    if len(permissions) <= 0:
+        raise AuthError({
+            'code': 'no_permissions_found',
+            'description': 'Expected to find some user permission but found none'
+        }, 401)
     
     return True
 
