@@ -68,7 +68,7 @@ def get_drinks_detail(payload):
 '''
 @app.route('/drinks', methods=['POST'])
 @requires_auth()
-def create_drink():
+def create_drink(payload):
     return jsonify({'success':True})
 
 '''
@@ -84,7 +84,7 @@ def create_drink():
 '''
 @app.route('/drinks/<int:drink_id>', methods=['PATCH'])
 @requires_auth()
-def edit_drink():
+def edit_drink(payload, drink_id):
     return jsonify({'success':True})
 
 '''
@@ -99,7 +99,7 @@ def edit_drink():
 '''
 @app.route('/drinks/<int:drink_id>', methods=['DELETE'])
 @requires_auth()
-def delete_drink(drink_id):
+def delete_drink(payload, drink_id):
     return jsonify({'success':True})
 
 ## Error Handling
