@@ -11,16 +11,17 @@ app = Flask(__name__)
 setup_db(app)
 
 # set up cors for the application
-CORS(app, resources={r'/': {'origins': '*'}})
+CORS(app)
 
-# to set Access-Control-Allow Headers and Methods
-@app.after_request
-def after_request(response):
-    response.headers.add('Access-Control-Allow-Headers',
-                         'Content-Type, Authorization, true')
-    response.headers.add('Access-Control-Allow-Methods',
-                         'GET, PATCH,PUT,POST, DELETE, OPTIONS')
-    return response
+# # to set Access-Control-Allow Headers and Methods
+# @app.after_request
+# def after_request(response):
+#     response.headers.add('Access-Control-Allow-Headers',
+#                          'Content-Type, Authorization, true')
+#     response.headers.add('Access-Control-Allow-Methods',
+#                          'GET, PATCH,PUT,POST, DELETE, OPTIONS')
+#     print(response)
+#     return response
 
 '''
 @TODO uncomment the following line to initialize the datbase
@@ -53,8 +54,9 @@ def get_drinks():
 
     for result in query:
         drink = {
+            'id': result.id,
             'title': result.title,
-            'recipe': json.loads(json.dumps(result.short()))
+            'recipe': json.loads(json.dumps(result.short()['recipe']))
         }
         drinks.append(drink)
 
@@ -77,8 +79,9 @@ def get_drinks_detail(payload):
 
     for result in query:
         drink = {
+            'id': result.id,
             'title': result.title,
-            'recipe': json.loads(json.dumps(result.long()))
+            'recipe': json.loads(json.dumps(result.long()['recipe']))
         }
         drinks.append(drink)
 
