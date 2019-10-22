@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify, abort
 from sqlalchemy import exc
 import json
 from flask_cors import CORS
-
+from .database.seeds import seed_drinks
 from .database.models import db_drop_and_create_all, setup_db, Drink
 from .auth.auth import AuthError, requires_auth
 
@@ -29,6 +29,13 @@ def after_request(response):
 '''
 db_drop_and_create_all()
 
+for seed_drink in seed_drinks:
+    new_seed_drink = Drink(
+        title=seed_drink['title'],
+        recipe=seed_drink['recipe']
+    )
+    Drink.insert(new_seed_drink)
+
 ## ROUTES
 '''
 @TODO implement endpoint
@@ -40,7 +47,18 @@ db_drop_and_create_all()
 '''
 @app.route('/drinks', methods=['GET'])
 def get_drinks():
-    return jsonify({'success':True , 'drinks':[]})
+
+    query = Drink.query.all()
+    drinks = []
+
+    for result in query:
+        drink = {
+            'title': result.title,
+            'recipe': json.loads(json.dumps(result.short()))
+        }
+        drinks.append(drink)
+
+    return jsonify({'success':True , 'drinks': drinks}),200
 
 '''
 @TODO implement endpoint
@@ -53,7 +71,18 @@ def get_drinks():
 @app.route('/drinks-detail', methods=['GET'])
 @requires_auth()
 def get_drinks_detail(payload):
-    return jsonify({'success':True})
+
+    query = Drink.query.all()
+    drinks = []
+
+    for result in query:
+        drink = {
+            'title': result.title,
+            'recipe': json.loads(json.dumps(result.long()))
+        }
+        drinks.append(drink)
+
+    return jsonify({'success':True , 'drinks': drinks}),200
 
 
 

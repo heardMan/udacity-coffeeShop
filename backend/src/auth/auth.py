@@ -73,7 +73,7 @@ def get_token_auth_header():
     it should raise an AuthError if the requested permission string is not in the payload permissions array
     return true otherwise
 '''
-def check_permissions(permission, payrload):
+def check_permissions(permission, payload):
     '''this is a test payload with no permissions property'''
     # payload = {
     #     'iss': 'https://dev-y5wb70ja.auth0.com/',
@@ -84,6 +84,7 @@ def check_permissions(permission, payrload):
     #     'azp': '4KLyPcC6GX5yKHM7fPByy6uOAej4mnsW',
     #     'scope': ''}
     permissions = []
+    print(payload)
     if permission is not '':
         _permissions_ = permission.split(',')
         for _permission_ in _permissions_:
@@ -101,7 +102,7 @@ def check_permissions(permission, payrload):
             'code': 'no_permissions_found',
             'description': 'Expected to find some user permission but found none'
         }, 401)
-    
+    print(permissions)
     return True
 
 '''
