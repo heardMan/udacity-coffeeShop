@@ -3,7 +3,6 @@ from flask import Flask, request, jsonify, abort
 from sqlalchemy import exc
 import json
 from flask_cors import CORS
-from .database.seeds import seed_drinks
 from .database.models import db_drop_and_create_all, setup_db, Drink
 from .auth.auth import AuthError, requires_auth
 
@@ -29,6 +28,27 @@ CORS(app)
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 '''
 db_drop_and_create_all()
+
+drink1 = {
+  'title': 'matcha shake',
+  'recipe': '[{"name": "milk", "color": "grey", "parts": 1},{"name": "matcha", "color": "green", "parts": 3}]'
+}
+
+drink2 = {
+  'title': 'flatwhite',
+  'recipe': '[{"name": "milk", "color": "grey", "parts": 3},{"name": "coffee", "color": "brown", "parts": 1}]'
+}
+
+drink3 = {
+  'title': 'cap',
+  'recipe': '[{"name":"foam", "color":"white", "parts":1},{"name":"milk", "color":"grey", "parts":2},{"name":"coffee","color":"brown","parts": 1}]'
+}
+
+seed_drinks = [
+  drink1,
+  drink2,
+  drink3,
+]
 
 for seed_drink in seed_drinks:
     new_seed_drink = Drink(

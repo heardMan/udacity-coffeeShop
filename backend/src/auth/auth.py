@@ -84,26 +84,33 @@ def check_permissions(permission, payload):
     #     'azp': '4KLyPcC6GX5yKHM7fPByy6uOAej4mnsW',
     #     'scope': ''}
     permissions = []
-    print(payload)
+    
     if permission is not '':
         _permissions_ = permission.split(',')
         for _permission_ in _permissions_:
             permissions.append(_permission_)
-    if payload.get('permissions') is None:
+
+    if payload.get('permissions') is None and payload.get('gty') is None:
         raise AuthError({
             'code': 'no_permissions_found_on_jwt_payload',
             'description': 'Expected a permissions property on the payload but one was not found'
         }, 401)
-    user_permissions = payload['permissions']
-    for user_permission in user_permissions:
-        permissions.append(user_permission)
-    if len(permissions) <= 0:
-        raise AuthError({
-            'code': 'no_permissions_found',
-            'description': 'Expected to find some user permission but found none'
-        }, 401)
-    print(permissions)
-    return True
+
+    elif payload.get('permissions') is not None:
+        user_permissions = payload['permissions']
+        for user_permission in user_permissions:
+            permissions.append(user_permission)
+        if len(permissions) <= 0:
+            raise AuthError({
+                'code': 'no_permissions_found',
+                'description': 'Expected to find some user permission but found none'
+            }, 401)
+        return permissions
+    elif payload.get('gty') is 'client-credentials':
+        permissions.append('testing')
+        return True
+    
+    return False
 
 '''
 @TODO implement verify_decode_jwt(token) method
