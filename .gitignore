@@ -11,6 +11,7 @@ log.txt
 *.sublime-workspace
 .vscode/
 npm-debug.log*
+__pycache__
 
 .idea/
 .ionic/
@@ -34,3 +35,4 @@ Thumbs.db
 UserInterfaceState.xcuserstate
 
 venv
+.env
