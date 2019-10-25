@@ -54,17 +54,24 @@ class TriviaTestCase(unittest.TestCase):
     # test route get drinks-detail
     def test_get_drinks_detail(self):
         """Test the get drinks-detail route"""
+
+        """Test Authorization"""
         #try to get drinks detail data without headers
         res_0 = self.client().get('/drinks-detail')
+        #parse data
         data_0 = json.loads(res_0.data)
+        #expect a 401 unauthorized status
         self.assertEqual(res_0.status_code, 401)
+        #expect the success property to be false
         self.assertEqual(data_0['success'], False)
 
+        """Test Functionality"""
         #get drinks detail data with headers
         res = self.client().get('/drinks-detail', headers=self.headers)
         #parse data
         data = json.loads(res.data)
         #ensure request was good
+        print(data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
         # ensure we have at least one category
@@ -73,6 +80,31 @@ class TriviaTestCase(unittest.TestCase):
     # test route post drink
     def test_post_drink(self):
         """Test the post drinks route"""
+
+        # """Test Authorization"""
+        # #try to get drinks detail data without headers
+        # post = self.client().post('/drink', json={
+        #     'title': 'test_one',
+        #     'recipe': [
+        #         {
+        #             'color': 'green',
+        #             'name': 'matcha',
+        #             'parts': 3
+        #         },
+        #         {
+        #             'color': 'white',
+        #             'name': 'milk',
+        #             'parts': 1
+        #         }
+        #     ]
+        # })
+        # #parse data
+        # post_data = json.loads(post.data)
+        # #expect a 401 unauthorized status
+        # self.assertEqual(post.status_code, 401)
+        # #expect the success property to be false
+        # self.assertEqual(post_data['success'], False)
+
         pass
 
     # test route patch drink

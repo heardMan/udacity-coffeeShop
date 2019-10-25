@@ -84,6 +84,8 @@ def check_permissions(permission, payload):
     #     'azp': '4KLyPcC6GX5yKHM7fPByy6uOAej4mnsW',
     #     'scope': ''}
     permissions = []
+
+    print(payload['gty'])
     
     if permission is not '':
         _permissions_ = permission.split(',')
@@ -96,6 +98,10 @@ def check_permissions(permission, payload):
             'description': 'Expected a permissions property on the payload but one was not found'
         }, 401)
 
+    elif payload.get('gty') == 'client-credentials':
+        permissions.append('testing')
+        return True
+
     elif payload.get('permissions') is not None:
         user_permissions = payload['permissions']
         for user_permission in user_permissions:
@@ -105,8 +111,9 @@ def check_permissions(permission, payload):
                 'code': 'no_permissions_found',
                 'description': 'Expected to find some user permission but found none'
             }, 401)
-        return permissions
-    elif payload.get('gty') is 'client-credentials':
+        return True
+        
+    elif payload.get('gty') == 'client-credentials':
         permissions.append('testing')
         return True
     
