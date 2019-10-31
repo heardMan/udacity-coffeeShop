@@ -2,6 +2,7 @@ import os
 import json
 import unittest
 import http.client
+from src.pyenv import TOKEN
 from src.api import app, seed_db
 
 from flask import request
@@ -21,22 +22,11 @@ class TriviaTestCase(unittest.TestCase):
         self.client = self.app.test_client
         self.database_name = "drink_test"
         self.database_path = test_database_path
-
-        conn = http.client.HTTPSConnection("dev-y5wb70ja.auth0.com")
-        payload = "{\"client_id\":\""+CLIENT_ID+"\",\"client_secret\":\""+CLIENT_SECRET + \
-            "\",\"audience\":\"drinks\",\"grant_type\":\"client_credentials\"}"
-        headers = {'content-type': "application/json"}
-        conn.request("POST", "/oauth/token", payload, headers)
-        res = conn.getresponse()
-        data = res.read()
-        json_data = json.loads(data)
-        token = json_data['access_token']
-        token_type = json_data['token_type']
+        
         self.headers = {
-            'authorization': '{} {}'.format(token_type, token)
+            'authorization': TOKEN
         }
-        conn.close()
-
+        
         # binds the app to the current context
         with self.app.app_context():
             self.db = SQLAlchemy()

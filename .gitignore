@@ -36,5 +36,6 @@ UserInterfaceState.xcuserstate
 
 venv
 .env
+pyenv.py
 
 udacity-fsnd-udaspicelatte.postman_collection.json
