@@ -57,52 +57,27 @@ def get_token_auth_header():
 
 def check_permissions(permission, payload):
     '''this is a test payload with no permissions property'''
+    print('payload: {}'.format(payload['permissions']))
+    print('permission: {}'.format(permission))
 
-    permissions = []
-    
-    if type(permission) is not str:
-        _permissions_ = permission.split(',')
-        for _permission_ in _permissions_:
-            permissions.append(_permission_)
+    if payload.get('permissions') is not None:
 
-    if payload.get('permissions') is None and payload.get('gty') is None:
+        for user_permission in payload['permissions']:
+            
+            if user_permission == permission:
+                print('PERMISSION: {} \nUSER PERMISSION:{}\n'.format(payload['permissions'], user_permission))
+                return True
+        
+        raise AuthError({
+            'code': 'incorrect_permissions',
+            'description': 'Correct permissions not found'
+        }, 401)
+    else:
         raise AuthError({
             'code': 'no_permissions_found_on_jwt_payload',
-            'description': 'Expected a permissions property on the payload but one was not found'
+            'description': 'No valid permissions found in token.'
         }, 401)
 
-    elif payload.get('gty') == 'client-credentials':
-        permissions.append('testing')
-        return True
-
-    elif payload.get('permissions') is not None:
-        
-        acceptable_permissions = [
-            'get:drinks',
-            'get:drinks-detail',
-            'post:drinks',
-            'delete:drinks',
-            'patch:drinks'
-        ]
-        
-
-        user_permissions = payload['permissions']
-        for user_permission in user_permissions:
-            if user_permission not in acceptable_permissions:
-                abort(401)
-            permissions.append(user_permission)
-        if len(permissions) <= 0:
-            raise AuthError({
-                'code': 'no_permissions_found',
-                'description': 'Expected to find some user permission but found none'
-            }, 401)
-        return True
-        
-    elif payload.get('gty') == 'client-credentials':
-        permissions.append('testing')
-        return True
-    
-    return False
 
 def verify_decode_jwt(token):
     jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
@@ -159,12 +134,15 @@ def verify_decode_jwt(token):
 
 
 def requires_auth(permission=''):
+    
     def requires_auth_decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
             
             try:
+                
                 token = get_token_auth_header()
+                
                 payload = verify_decode_jwt(token)
                 check_permissions(permission, payload)
             except AuthError as err:

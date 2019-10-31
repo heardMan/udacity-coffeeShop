@@ -132,16 +132,12 @@ def get_drinks():
 
 # authorized route that returns drinks along with detailed recipes
 @app.route('/drinks-detail', methods=['GET'])
-@requires_auth()
+@requires_auth('get:drinks-detail')
 def get_drinks_detail(payload):
     # create error instance and set it to false
     error = False
     # check the request method to make sure it is a GET request
     if request.method == 'GET':
-        # route permissions set to a boolean
-        get_permission = 'get:drinks-detail' in payload['permissions']
-        # check permisions and if rejected send client a 403 error
-        permission_check(payload, get_permission)
 
         # attempt a query to the database
         try:
@@ -174,28 +170,24 @@ def get_drinks_detail(payload):
 
 # authorized route that adds a drink to the database
 @app.route('/drinks', methods=['POST'])
-@requires_auth()
+@requires_auth('post:drinks')
 def create_drink(payload):
     # create error instance and set it to false
     error = False
     # check the request method to make sure it is a GET request
     if request.method == 'POST':
-        # route permissions set to a boolean
-        
-        post_permission = 'post:drinks' in payload['permissions']
-        
-        # check permisions and if rejected send client a 403 error
-        permission_check(payload, post_permission)
-        
+        # # route permissions set to a boolean
+
+        # post_permission = 'post:drinks' in payload['permissions']
+
+        # # check permisions and if rejected send client a 403 error
+        # permission_check(payload, post_permission)
+
         # if there is no data in the request let the client know the request was bad
-        if request.json == None:
-                abort(400)
 
         # attempt operation on the database
 
-        
         try:
-            
             # define new model
             new_drink = Drink(
                 title=request.json['title'],
@@ -204,8 +196,8 @@ def create_drink(payload):
             # ensure data in request is of type string
             if type(new_drink.title) is not str and type(new_drink.recipe) is not str:
                 abort(422)
-                
-            #add new drink to the database
+
+            # add new drink to the database
             new_drink.insert()
 
         except RequestError:
@@ -231,110 +223,113 @@ def create_drink(payload):
 
             # close database session
             db.session.close()
-        
+
     else:
         # send 405 error: method not allowed if not a get request
         abort(405)
 
 # authorized route that updates a drink in the database
 # or deletes a drink from the database depending on request context
+
+
 @app.route('/drinks/<int:drink_id>', methods=['PATCH', 'DELETE'])
-@requires_auth()
-def edit_drink(payload, drink_id):
+# @requires_auth('patch:drinks,delete:drinks')
+def edit_drink(drink_id):
     # create error instance and set it to false
     error = False
     # check the request method to make sure it is a GET request
     if request.method == 'PATCH':
-        # route permissions set to a boolean
-        patch_permission = 'patch:drinks' in payload['permissions']
-        # check permisions and if rejected send client a 403 error
-        permission_check(payload, patch_permission)
-        # attempt to perform database operations
-        # if there is no data in the request let the client know the request was bad
-        if request.json == None:
+        @requires_auth('patch:drinks')
+        def patch_drink(payload, drink_id):
+            error = False
+            if request.json == None:
                 abort(400)
+            try:
+                # query database
+                drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
+                # if no drinks are returned send 404 error to client
+                if drink is None:
+                    abort(404)
 
-        try:
-            # query database
-            drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
-            # if no drinks are returned send 404 error to client
-            if drink is None:
-                abort(404)
+                # set drink attributes using user input
+                drink.title = request.json.get('title')
 
-            #set drink attributes using user input
-            drink.title = request.json.get('title')
-            
-            # commit changes to database
-            drink.update()
+                # commit changes to database
+                drink.update()
 
+            except RequestError:
+                # set error to true and log on the server
+                error = True
+                # rollback database commit
+                db.session.rollback()
+                # log error on the server
+                print('Error: {}'.format(sys.exc_info()))
 
-        except RequestError:
-            # set error to true and log on the server
-            error = True
-            # rollback database commit
-            db.session.rollback()
-            # log error on the server
-            print('Error: {}'.format(sys.exc_info()))
+            finally:
+                # if error occurred send 400 error to the client
+                if error:
+                    abort(400)
+                else:
+                    # close database session
+                    
+                    return jsonify({
+                        'success': True,
+                        'drinks': [drink.long()]
 
-        finally:
-            # if error occurred send 400 error to the client
-            if error:
-                abort(400)
-            else:
-                return jsonify({
-                    'success': True,
-                    'drinks': [drink.long()]
-                })
+                        })
+                db.session.close()
+        return patch_drink(drink_id)
 
-            # close database session
-            db.session.close()
 
     elif request.method == 'DELETE':
+        @requires_auth('delete:drinks')
+        def delete_drink(payload, drink_id):
+            error = False
+            try:
+                # find the drink to delete in the database
+                query = Drink.query.get(drink_id)
+                # if no drinks are returned send 404 error to client
+                if query is None:
+                    abort(404)
+                # remove frink from database
+                query.delete()
+
+            except RequestError:
+                # set error to true and log on the server
+                error = True
+                # rollback database commit
+                db.session.rollback()
+                # log error on the server
+                print('Error: {}'.format(sys.exc_info()))
+
+            finally:
+                # if error occurred send 400 error to the client
+                if error:
+                    # send bad request error
+                    abort(400)
+                else:
+                    # if no error send success object and log on server
+                    print('Deleted: {}'.format(query))
+                    return jsonify({
+                        'success': True,
+                        'drinks': drink_id
+                        })
+                # close database session
+                db.session.close()
+        return delete_drink(drink_id)
         
-        # route permissions set to a boolean
-        delete_permission = 'delete:drinks' in payload['permissions']
-        # check permisions and if rejected send client a 403 error
-        permission_check(payload, delete_permission)
 
-        try:
-            # find the drink to delete in the database
-            query = Drink.query.get(drink_id)
-            # if no drinks are returned send 404 error to client
-            if query is None:
-                abort(404)
-            # remove frink from database
-            query.delete()
-
-        except RequestError:
-            # set error to true and log on the server
-            error = True
-            # rollback database commit
-            db.session.rollback()
-            # log error on the server
-            print('Error: {}'.format(sys.exc_info()))
-
-        finally:
-            # if error occurred send 400 error to the client
-            if error:
-                # send bad request error
-                abort(400)
-            else:
-                # if no error send success object and log on server
-                print('Deleted: {}'.format(query))
-                return jsonify({
-                    'success': True,
-                    'drinks': drink_id
-                })
-            # close database session
-            db.session.close()
     else:
         # send 405 error: method not allowed if not a get request
         abort(405)
 
 
 # add a request error definition for db request errors
+
+
 class RequestError(Exception):
     """Raised when something goes wrong with the request"""
+
     def __init__(self, error, status_code):
         self.error = error
         self.status_code = status_code
@@ -355,7 +350,7 @@ def unathorized(error):
         "success": False,
         "error": 401,
         "status": "Unauthorized",
-        "message": "You do not have the necessary authorization to access this resource",
+        "message": error.description,
     }), 401
 
 # handle unauthorized request errors
