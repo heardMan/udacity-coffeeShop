@@ -60,7 +60,7 @@ def check_permissions(permission, payload):
 
     permissions = []
     
-    if permission is not '':
+    if type(permission) is not str:
         _permissions_ = permission.split(',')
         for _permission_ in _permissions_:
             permissions.append(_permission_)

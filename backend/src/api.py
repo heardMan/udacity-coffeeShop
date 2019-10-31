@@ -83,7 +83,7 @@ def permission_check(payload, route_permissions):
     test_permissions = test_creds is True
     # checks permissions and sends a 403 if they are not correct
     if route_permissions is False and test_permissions is False:
-        abort(403)
+        abort(401)
 
     return True
 
@@ -256,21 +256,17 @@ def edit_drink(payload, drink_id):
 
         try:
             # query database
-            drink = Drink.query.get(drink_id)
+            drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
             # if no drinks are returned send 404 error to client
             if drink is None:
                 abort(404)
 
             #set drink attributes using user input
             drink.title = request.json.get('title')
-            drink.recipe = json.dumps(request.json.get('recipe'))
-
-            # ensure data in request is of type string
-            if type(drink.title) is not str and type(drink.recipe) is not str:
-                abort(422)
-
+            
             # commit changes to database
-            db.session.commit()
+            drink.update()
+
 
         except RequestError:
             # set error to true and log on the server
@@ -294,15 +290,19 @@ def edit_drink(payload, drink_id):
             db.session.close()
 
     elif request.method == 'DELETE':
+        
         # route permissions set to a boolean
         delete_permission = 'delete:drinks' in payload['permissions']
         # check permisions and if rejected send client a 403 error
         permission_check(payload, delete_permission)
 
         try:
+            # find the drink to delete in the database
             query = Drink.query.get(drink_id)
+            # if no drinks are returned send 404 error to client
             if query is None:
                 abort(404)
+            # remove frink from database
             query.delete()
 
         except RequestError:
