@@ -4,26 +4,7 @@
 Welcome to udacity coffee shop! This is a simple and fun full stack application that I used to learn and improve my skills at User Authentication and Authorization.
 In addtion, I got some hands-on practice at setting up and implementing a code review infrastructure. 
 
-## Technology Stack
-
-There are two main directories to this application
-
-<ul>
-<li>
-<h3><a href="https://github.com/heardMan/udacity-coffeeShop/backend">Backend Directory</a></h3>
-<p>
-This directory contains the flask application that acts as a server to the frontend application.
-Please click <a>here</a> to get started learning more.
-</p>
-</li>
-<li>
-<h3><a href="https://github.com/heardMan/udacity-coffeeShop/frontend">Frontend Directory</a></h3>
-<p>
-This directory contains the ionic application that receives and parses user input and then interacts with the backend application.
-Please click <a>here</a> to get started learning more.
-</p>
-</li>
-</ul>
+This application is separated into two major components: the front-end/client facing application and the back-end/server application. Below are section that contain and describe all the detail for setting up and running eiter application. 
 
 ## Virtual Environments
 
@@ -31,41 +12,6 @@ Use of a virtual environment is highly recommended and this application takes th
 Please name your virtual environment: <strong>venv</strong>
 If for some reason you must name your virtual environment something other than venv 
 please make sure to add the directory to the .gitignore file or your changes will be rejected in review.
-
-## Front End Application
-
-First things first!
-
-If you do not have it already... you will need to install NodeJS to get started on this project.
-
-You can download NodeJS <a href="https://nodejs.org/en/download/">here</a>
-
-
-The Frontend portion of this application is an Ionic Freamework Application.
-
-Check out the documentation here -- <a href="https://ionicframework.com/docs">Iocnic Documentation</a>
-
-
-You will need the ionic framework CLI which you can download with following command via npm:
-
-```
-npm install -g ionic
-```
-
-With the exception of a few minor changes this portion of the application is largely unchanged.
-
-
-### Development Set Up Instructions
-
-Once you are done configuring your environemntal variables open up your terminal or command line application in your root directory and enter the following commands:
-
-```
-cd frontend
-npm i
-ionic serve
-```
-
-NOTE: Do NOT use ionic serve for production pruposes. In order to get the full benefits and functionality you should create a production build as detailed in the <a href="https://ionicframework.com/docs">Ionic Documentation</a>
 
 ## Back End Application
 
@@ -132,6 +78,12 @@ Then navigate to the User&Roles Heading of your Auth0 account and create the fol
  </li>
 </ul>
 
+Once your testing API is set up you will need to update the variable 'AUTH0_DOMAIN' to the tenant domain of your udacity-coffee application.
+
+From the root directory this file can be found at ```/backend/src/auth/auth.py```
+
+If you named your test api something other than drinks you will also need to update the 'API_AUDIENCE' varible as well.
+
 ### Development Testing
 
 This application actually has two means of testing:
@@ -151,7 +103,41 @@ export AUTH_CLIENT_SECRET='auth0 client secret formatted as a string'
 python test_auth_api.py
 ```
 
-### API DOCUMENTATION
+## Front End Application
+
+First things first!
+
+If you do not have it already... you will need to install NodeJS to get started on this project.
+
+You can download NodeJS <a href="https://nodejs.org/en/download/">here</a>
+
+
+The Frontend portion of this application is an Ionic Freamework Application.
+
+Check out the documentation here -- <a href="https://ionicframework.com/docs">Iocnic Documentation</a>
+
+
+You will need the ionic framework CLI which you can download with following command via npm:
+
+```
+npm install -g ionic
+```
+
+With the exception of a few minor changes this portion of the application is largely unchanged.
+
+### Development Set Up Instructions
+
+Once you are done configuring your environemntal variables open up your terminal or command line application in your root directory and enter the following commands:
+
+```
+cd frontend
+npm i
+ionic serve
+```
+
+NOTE: Do NOT use ionic serve for production pruposes. In order to get the full benefits and functionality you should create a production build as detailed in the <a href="https://ionicframework.com/docs">Ionic Documentation</a>
+
+## API DOCUMENTATION
 
 The following example calls will all make the assumption that one is currently running a development server on port 5000.
 
@@ -429,7 +415,7 @@ sample response:
 }, 500
 ```
 
-### conclusion
+### Conclusion
 
 Thank you for your interest in udacity-coffeeShop!
 
