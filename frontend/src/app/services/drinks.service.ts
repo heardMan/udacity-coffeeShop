@@ -94,15 +94,13 @@ export class DrinksService {
     if (this.auth.can('get:drinks-detail')) {
       this.http.get(this.url + '/drinks-detail', this.getHeaders())
       .subscribe((res: any) => {
-
         this.drinksToItems(res.drinks);
-        console.log(res);
       });
     } else {
       this.http.get(this.url + '/drinks', this.getHeaders())
       .subscribe((res: any) => {
         this.drinksToItems(res.drinks);
-        console.log(res);
+        //console.log(res);
       });
     }
 
@@ -119,8 +117,11 @@ export class DrinksService {
     } else { // insert
       this.http.post(this.url + '/drinks', drink, this.getHeaders())
       .subscribe( (res: any) => {
+        
         if (res.success) {
+          console.log(res)
           this.drinksToItems(res.drinks);
+          this.getDrinks()
         }
       });
     }
@@ -138,8 +139,6 @@ export class DrinksService {
   drinksToItems( drinks: Array<Drink>) {
     for (const drink of drinks) {
       this.items[drink.id] = drink;
-      console.log(this.items)
-
     }
   }
 }

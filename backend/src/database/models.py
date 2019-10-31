@@ -6,6 +6,7 @@ import json
 database_filename = "database.db"
 project_dir = os.path.dirname(os.path.abspath(__file__))
 database_path = "sqlite:///{}".format(os.path.join(project_dir, database_filename))
+test_database_path = "sqlite:///{}/test".format(os.path.join(project_dir, database_filename))
 
 db = SQLAlchemy()
 
@@ -35,7 +36,7 @@ a persistent drink entity, extends the base SQLAlchemy Model
 '''
 class Drink(db.Model):
     # Autoincrementing, unique primary key
-    id = Column(Integer().with_variant(Integer, "sqlite"), primary_key=True)
+    id = Column(Integer().with_variant(Integer, "sqlite"), primary_key=True, nullable=False)
     # String Title
     title = Column(String(80), unique=True)
     # the ingredients blob - this stores a lazy json blob
@@ -78,6 +79,7 @@ class Drink(db.Model):
     def insert(self):
         db.session.add(self)
         db.session.commit()
+        
 
     '''
     delete()

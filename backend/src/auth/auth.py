@@ -96,17 +96,34 @@ def check_permissions(permission, payload):
             'description': 'Expected a permissions property on the payload but one was not found'
         }, 401)
 
+    elif payload.get('gty') == 'client-credentials':
+        permissions.append('testing')
+        return True
+
     elif payload.get('permissions') is not None:
+        print(payload)
+        acceptable_permissions = [
+            'get:drinks',
+            'get:drinks-detail',
+            'post:drinks',
+            'delete:drinks',
+            'patch:drinks'
+        ]
+        
+
         user_permissions = payload['permissions']
         for user_permission in user_permissions:
+            if user_permission not in acceptable_permissions:
+                abort(401)
             permissions.append(user_permission)
         if len(permissions) <= 0:
             raise AuthError({
                 'code': 'no_permissions_found',
                 'description': 'Expected to find some user permission but found none'
             }, 401)
-        return permissions
-    elif payload.get('gty') is 'client-credentials':
+        return True
+        
+    elif payload.get('gty') == 'client-credentials':
         permissions.append('testing')
         return True
     
