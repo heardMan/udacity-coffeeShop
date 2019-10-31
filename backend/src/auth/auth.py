@@ -84,8 +84,6 @@ def check_permissions(permission, payload):
     #     'azp': '4KLyPcC6GX5yKHM7fPByy6uOAej4mnsW',
     #     'scope': ''}
     permissions = []
-
-    print(payload['gty'])
     
     if permission is not '':
         _permissions_ = permission.split(',')
@@ -103,8 +101,20 @@ def check_permissions(permission, payload):
         return True
 
     elif payload.get('permissions') is not None:
+        print(payload)
+        acceptable_permissions = [
+            'get:drinks',
+            'get:drinks-detail',
+            'post:drinks',
+            'delete:drinks',
+            'patch:drinks'
+        ]
+        
+
         user_permissions = payload['permissions']
         for user_permission in user_permissions:
+            if user_permission not in acceptable_permissions:
+                abort(401)
             permissions.append(user_permission)
         if len(permissions) <= 0:
             raise AuthError({
