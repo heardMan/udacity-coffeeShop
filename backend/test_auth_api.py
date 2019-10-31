@@ -22,11 +22,11 @@ class TriviaTestCase(unittest.TestCase):
         self.client = self.app.test_client
         self.database_name = "drink_test"
         self.database_path = test_database_path
-        
+
         self.headers = {
             'authorization': TOKEN
         }
-        
+
         # binds the app to the current context
         with self.app.app_context():
             self.db = SQLAlchemy()

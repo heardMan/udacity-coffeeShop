@@ -271,15 +271,14 @@ def edit_drink(drink_id):
                     abort(400)
                 else:
                     # close database session
-                    
+
                     return jsonify({
                         'success': True,
                         'drinks': [drink.long()]
 
-                        })
+                    })
                 db.session.close()
         return patch_drink(drink_id)
-
 
     elif request.method == 'DELETE':
         @requires_auth('delete:drinks')
@@ -313,11 +312,10 @@ def edit_drink(drink_id):
                     return jsonify({
                         'success': True,
                         'drinks': drink_id
-                        })
+                    })
                 # close database session
                 db.session.close()
         return delete_drink(drink_id)
-        
 
     else:
         # send 405 error: method not allowed if not a get request
