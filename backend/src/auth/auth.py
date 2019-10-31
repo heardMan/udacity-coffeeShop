@@ -101,7 +101,7 @@ def check_permissions(permission, payload):
         return True
 
     elif payload.get('permissions') is not None:
-        print(payload)
+        
         acceptable_permissions = [
             'get:drinks',
             'get:drinks-detail',
